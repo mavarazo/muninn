@@ -1,0 +1,41 @@
+{% macro refresh(title, data_source='') -%}
+<div class="col">
+    <div class="card card-info" id="{{ id }}">
+        <div class="card-header">
+            <h3 class="card-title">{{ title }}</h3>
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="card-refresh"
+                    data-source="{{ data_source }}" data-load-on-init="true" data-content=".list-group">
+                    <i class="fas fa-sync-alt"></i></button>
+                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
+                        class="fas fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="list-group list-group-flush"></div>
+        </div>
+    </div>
+</div>
+{%- endmacro %}
+
+{% macro audio(title, data_source='') -%}
+<div class="col">
+    <div class="card card-warning">
+        <div class="card-header">
+            <h3 class="card-title">{{ title }}</h3>
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="card-refresh"
+                    data-source="{{ data_source }}" data-load-on-init="true" data-content=".list-group">
+                    <i class="fas fa-sync-alt"></i></button>
+                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
+                        class="fas fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="list-group list-group-flush"></div>
+        </div>
+    </div>
+
+    <audio id="audio-player" class="d-none" controls="controls" volume="1.0"></audio>
+</div>
+{%- endmacro %}

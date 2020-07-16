@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+{% import 'fragments/cards.html' as card %}
+
+<div class="row">
+  {{ card.audio('Radio', '/radio') }} 
+</div>
+
+<div class="row">
+  {{ card.refresh('Jenkins', '/jenkins') }}
+  {{ card.refresh('SonarQube', '/sonarqube') }}
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="{{ url_for('static', filename='audioplayer.js') }}"></script>
+
+<script>
+  $(function () {
+    setInterval(function () {
+      $('*[data-card-widget="card-refresh"]').click();
+    }, 60000)
+  });
+</script>
+{% endblock %}

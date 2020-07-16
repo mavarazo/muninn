@@ -1,0 +1,4 @@
+{% for station in stations %}
+<a href="#" class="list-group-item list-group-item-action station"
+    data-station-url="{{ station.url }}">{{ station.name }}</a>
+{% endfor %}

@@ -1,0 +1,10 @@
+{% for job in jobs %}
+<a href="{{ job.url }}" target="_blank" class="list-group-item list-group-item-action">{{ job.name }}
+
+    {% if job.healthy %}
+    <span class="float-right badge bg-primary"><i class="fas fa-heart"></i></span>
+    {% else %}
+    <span class="float-right badge bg-danger"><i class="fas fa-heart-broken"></i></span>
+    {% endif %}
+</a>
+{% endfor %}

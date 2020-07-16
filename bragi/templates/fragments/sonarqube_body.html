@@ -1,0 +1,48 @@
+{% for portfolio in portfolios %}
+{% for application in portfolio.applications %}
+<a href="https://codeanalysis.internal.adcubum.com/dashboard?id={{ application.key}}" target="_blank"
+    class="list-group-item list-group-item-action">{{ application.key }}</a>
+
+
+<div class="list-group-item">
+    {% import 'fragments/sonarqube_body.html' as metric %}
+    {{ metric.default('Bugs', application.new_bugs, application.bugs) }}
+    {{ metric.default('Vulnerabilities', application.new_vulnerabilities, application.vulnerabilities) }}
+    {{ metric.default('Debt', format_minutes_to_workingdays(application.new_technical_debt|int), format_minutes_to_workingdays(application.sqale_index|int)) }}
+    {{ metric.default('Code Smells', application.new_code_smells, application.code_smells) }}
+
+    <div class="row">
+        <div class="col-md-4">New Coverage</div>
+        {%- if application.new_coverage|float is gt 0 %}
+        <div class="col-md-4 text-success">
+        {%- elif application.new_coverage|float is eq 0 %}
+        <div class="col-md-4 text-warning">
+        {%- else %}
+        <div class="col-md-4 text-danger">
+        {%- endif %}
+        {{ format_to_percentage(application.new_coverage|float) }} <small>{{ application.new_lines_to_cover }} New Lines</small></div>
+        <div class="col-md-4 text-muted">{{ format_to_percentage(application.coverage|float) }}</div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">Duplications</div>
+        {%- if application.new_duplicated_lines_density|float is gt 0 %}
+        <div class="col-md-4 text-danger">
+        {%- else %}
+        <div class="col-md-4 text-success">
+        {%- endif %}
+        {{ format_to_percentage(application.new_duplicated_lines_density|float) }} <small>{{ application.new_lines }} New Lines</small></div>
+        <div class="col-md-4 text-muted">{{ format_to_percentage(application.duplicated_lines_density|float) }}</div>
+    </div>
+</div>
+
+{% endfor %}
+{% endfor %}
+
+{% macro default(metric, new, total) -%}
+<div class="row">
+    <div class="col-md-4">{{ metric }}</div>
+    <div class="col-md-4 text-bold">+ {{ new }}</div>
+    <div class="col-md-4 text-muted">{{ total }}</div>
+</div>
+{%- endmacro %}
