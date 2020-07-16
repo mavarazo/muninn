@@ -73,9 +73,6 @@ class Portfolio:
 
 class SonarQubeClient:
 
-    SONARQUBE_TOKEN = ''
-    SONARQUBE_URL_COMPONENT = ''
-
     METRICS_MAPPING = {
         'bugs': Application.add_bugs,
         'new_bugs': Application.add_new_bugs,
@@ -92,6 +89,10 @@ class SonarQubeClient:
         'new_duplicated_lines_density': Application.add_new_duplicated_lines_density,
         'new_lines': Application.add_new_lines
     }
+
+    def __init__(self, token, url):
+        self.SONARQUBE_TOKEN = token
+        self.SONARQUBE_URL_COMPONENT = url
 
     def fetch(self, portfolio):
         for application in portfolio.applications:

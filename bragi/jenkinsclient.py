@@ -14,8 +14,10 @@ class Job:
 class JenkinsClient:
 
     API_PREFIX = '/api/json?pretty=true'
-    JENKINS_USERNAME = ''
-    JENKINS_TOKEN = ''
+
+    def __init__(self, username, token):
+        self.JENKINS_USERNAME = username
+        self.JENKINS_TOKEN = token
 
     def fetch(self, job):
         api = job.url + self.API_PREFIX

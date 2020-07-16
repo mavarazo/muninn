@@ -1,5 +1,5 @@
 from flask import (Blueprint, flash, g, redirect, render_template, request,
-                   url_for)
+                   url_for, current_app)
 
 from bragi.jenkinsclient import JenkinsClient, Job
 
@@ -14,7 +14,7 @@ bp = Blueprint('jenkins', __name__)
 
 @bp.route('/')
 def index():
-    client = JenkinsClient()
+    client = JenkinsClient(current_app.config['JENKINS_USERNAME'], current_app.config['JENKINS_TOKEN'])
     for job in jobs:
         client.fetch(job)
         job.healthy = client.get_health()

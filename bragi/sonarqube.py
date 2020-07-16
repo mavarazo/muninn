@@ -1,5 +1,5 @@
-from flask import (Blueprint, flash, g, redirect, render_template, request,
-                   url_for)
+from flask import (Blueprint, current_app, flash, g, redirect, render_template,
+                   request, url_for)
 
 from bragi.sonarqubeclient import Application, Portfolio, SonarQubeClient
 
@@ -11,7 +11,7 @@ bp = Blueprint('sonarqube', __name__)
 
 @bp.route('/')
 def index():
-    client = SonarQubeClient()
+    client = SonarQubeClient(current_app.config['SONARQUBE_TOKEN'], current_app.config['SONARQUBE_URL_COMPONENT'])
     for portfolio in portfolios:
         client.fetch(portfolio)
     return render_template('fragments/sonarqube_body.html', portfolios=portfolios)

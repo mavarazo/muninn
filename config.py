@@ -10,3 +10,8 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    JENKINS_USERNAME = os.environ.get('JENKINS_USERNAME')
+    JENKINS_TOKEN = os.environ.get('JENKINS_TOKEN')
+    SONARQUBE_TOKEN = os.environ.get('SONARQUBE_TOKEN')
+    SONARQUBE_URL_COMPONENT = os.environ.get('SONARQUBE_URL_COMPONENT')
