@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import List
+from logging import Logger
 
 import requests
 from requests.auth import HTTPBasicAuth
@@ -90,11 +91,12 @@ class SonarQubeClient:
         'new_lines': Application.add_new_lines
     }
 
-    def __init__(self, token, url):
+    def __init__(self, logger:Logger, token:str, url:str):
+        self.logger = logger
         self.SONARQUBE_TOKEN = token
         self.SONARQUBE_URL_COMPONENT = url
 
-    def fetch(self, portfolio):
+    def fetch(self, portfolio:Portfolio):
         for application in portfolio.applications:
             querystring = {
             "component": application.key,
@@ -102,19 +104,22 @@ class SonarQubeClient:
             "metricKeys": 'bugs,new_bugs,vulnerabilities,new_vulnerabilities,sqale_index,new_technical_debt,code_smells,new_code_smells,coverage,new_coverage,new_lines_to_cover,duplicated_lines_density,new_duplicated_lines_density,new_lines',
             "ps": 500
             }
-
-            response = requests.request('GET',
-                self.SONARQUBE_URL_COMPONENT,
-                auth=HTTPBasicAuth(self.SONARQUBE_TOKEN, ''),
-                params=querystring)
-
-            if response.status_code != 200:
-                break
             
-            for measure in response.json()['baseComponent']['measures']:
-                try:
-                    key = measure['metric']
-                    value =  measure['value'] if 'value' in measure else measure['periods'][0]['value']
-                    self.METRICS_MAPPING[key](application, value)
-                except KeyError as e:
-                    print(f"Error {e}: {measure}")
+            try:
+                response = requests.request('GET',
+                    self.SONARQUBE_URL_COMPONENT,
+                    auth=HTTPBasicAuth(self.SONARQUBE_TOKEN, ''),
+                    params=querystring)
+
+                if response.status_code != 200:
+                    break
+                
+                for measure in response.json()['baseComponent']['measures']:
+                    try:
+                        key = measure['metric']
+                        value =  measure['value'] if 'value' in measure else measure['periods'][0]['value']
+                        self.METRICS_MAPPING[key](application, value)
+                    except KeyError as e:
+                        print(f"Error {e}: {measure}")
+            except Exception as e:
+                self.logger.error(e)

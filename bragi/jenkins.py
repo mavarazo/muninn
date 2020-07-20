@@ -14,7 +14,7 @@ bp = Blueprint('jenkins', __name__)
 
 @bp.route('/')
 def index():
-    client = JenkinsClient(current_app.config['JENKINS_USERNAME'], current_app.config['JENKINS_TOKEN'])
+    client = JenkinsClient(current_app.logger, current_app.config['JENKINS_USERNAME'], current_app.config['JENKINS_TOKEN'])
     for job in jobs:
         client.fetch(job)
         job.healthy = client.get_health()
