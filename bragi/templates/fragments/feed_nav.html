@@ -1,0 +1,8 @@
+{% for feed in feeds %}
+<li class="nav-item">
+    <a href="{{ url_for('feed.index', id=feed.id) }}" class="nav-link">
+        <i class="far fa-circle nav-icon"></i>
+        <p>{{ feed.name }}</p>
+    </a>
+</li>
+{% endfor %}
