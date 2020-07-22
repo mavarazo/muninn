@@ -1,3 +1,4 @@
+from datetime import datetime
 from dataclasses import dataclass, field
 from typing import List, Optional
 from xml.etree.ElementTree import Element
@@ -37,6 +38,8 @@ class AtomEntry:
     id: str
     title: str
     url: Optional[str] = None
+    published: Optional[datetime] = None
+    updated: Optional[datetime] = None
     summary: Optional[str] = None
 
 @dataclass
@@ -76,6 +79,8 @@ class AtomClient:
         id = _get_text(element, './feed:id')
         title = _get_text(element, './feed:title')
         url = _get_attribute_text(element, './feed:link[@rel="alternate"]', 'href')
+        published = _get_text(element, './feed:published')
+        updated = _get_text(element, './feed:updated')
         summary = _get_text(element, './feed:summary')
 
-        return AtomEntry(id, title, url, summary)
+        return AtomEntry(id, title, url, published, updated, summary)

@@ -1,25 +1,34 @@
-from flask import (Blueprint, flash, g, redirect, render_template, request,
-                   url_for, jsonify)
+from dataclasses import dataclass, field
+from typing import List, Optional
+
+from flask import (Blueprint, flash, g, jsonify, redirect, render_template,
+                   request, url_for)
 
 from bragi import db
+from bragi.feedclient import AtomClient, AtomFeed, AtomEntry
 from bragi.models import Feed, FeedEntry
-
-from bragi.feedclient import AtomClient
 
 bp = Blueprint('feed', __name__)
 
 
-@bp.route('/api/')
-def api_all():
-    return jsonify(render_template('fragments/feed_nav.html', feeds=Feed.query.all()))
+@dataclass
+class Subscription:
+    id: int
+    feed: AtomFeed
+
 
 @bp.route('/')
 def index():
-    feed = Feed.query.filter_by(id=request.args.get('id')).first()
-    if not feed:
-        feed = Feed(name='ComputerBase', url='https://www.computerbase.de/rss/news.xml')
-        db.session.add(feed)
-        db.session.commit()
+    feeds = Feed.query.order_by(Feed.name.desc())
+    id = request.args.get('id')
+    subscriptions = []
+    inbox = []
+    for feed in feeds:
+        response = AtomClient().fetch(feed.url)
+        subscription = Subscription(feed.id, response)
+        subscriptions.append(subscription)
+        if not id or feed.id == id:
+            inbox.extend(response.entries)
 
-    feed = AtomClient().fetch(feed.url)
-    return render_template('feed.html', feed=feed)
+    inbox.sort(key=lambda r: r.published)
+    return render_template('feed/index.html', subscriptions=subscriptions, inbox=inbox)
