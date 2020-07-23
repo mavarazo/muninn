@@ -51,7 +51,7 @@ class JenkinsClient:
         try:
             response = requests.get(url, auth=(self.JENKINS_USERNAME, self.JENKINS_TOKEN))
             if response.status_code == 401:
-                self.logger.error(f"{response.status_code}: unauthorized")
+                self.logger.error(f"{response.status_code}: unauthorized ({self.JENKINS_USERNAME}/{self.JENKINS_TOKEN})")
                 return None
 
             if response.status_code != 200:
