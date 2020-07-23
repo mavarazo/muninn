@@ -8,7 +8,18 @@
     {% import 'fragments/sonarqube_body.html' as metric %}
     {{ metric.default('Bugs', application.new_bugs, application.bugs) }}
     {{ metric.default('Vulnerabilities', application.new_vulnerabilities, application.vulnerabilities) }}
-    {{ metric.default('Debt', format_minutes_to_workingdays(application.new_technical_debt|int), format_minutes_to_workingdays(application.sqale_index|int)) }}
+
+    <div class="row">
+        <div class="col-md-4">Debt</div>
+        {%- if application.new_technical_debt|int is gt 0 %}
+        <div class="col-md-4 text-danger">
+        {%- else %}
+        <div class="col-md-4 text-success">
+        {%- endif %}
+        + {{ format_minutes_to_workingdays(application.new_technical_debt|int) }}</div>
+        <div class="col-md-4 text-muted">{{ format_minutes_to_workingdays(application.sqale_index|int) }}</div>
+    </div>
+
     {{ metric.default('Code Smells', application.new_code_smells, application.code_smells) }}
 
     <div class="row">
@@ -20,7 +31,7 @@
         {%- else %}
         <div class="col-md-4 text-danger">
         {%- endif %}
-        {{ format_to_percentage(application.new_coverage|float) }} <small>{{ application.new_lines_to_cover }} New Lines</small></div>
+        + {{ format_to_percentage(application.new_coverage|float) }} <small>{{ application.new_lines_to_cover }} New Lines</small></div>
         <div class="col-md-4 text-muted">{{ format_to_percentage(application.coverage|float) }}</div>
     </div>
 
@@ -31,7 +42,7 @@
         {%- else %}
         <div class="col-md-4 text-success">
         {%- endif %}
-        {{ format_to_percentage(application.new_duplicated_lines_density|float) }} <small>{{ application.new_lines }} New Lines</small></div>
+        + {{ format_to_percentage(application.new_duplicated_lines_density|float) }} <small>{{ application.new_lines }} New Lines</small></div>
         <div class="col-md-4 text-muted">{{ format_to_percentage(application.duplicated_lines_density|float) }}</div>
     </div>
 </div>
@@ -42,7 +53,12 @@
 {% macro default(metric, new, total) -%}
 <div class="row">
     <div class="col-md-4">{{ metric }}</div>
-    <div class="col-md-4 text-bold">+ {{ new }}</div>
+    {%- if new|int is gt 0 %}
+    <div class="col-md-4 text-danger"> 
+    {%- else %}
+    <div class="col-md-4 text-success">
+    {%- endif %}
+    + {{ new }}</div>
     <div class="col-md-4 text-muted">{{ total }}</div>
 </div>
 {%- endmacro %}
