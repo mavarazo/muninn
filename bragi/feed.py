@@ -30,5 +30,5 @@ def index():
         if not id or feed.id == id:
             inbox.extend(response.entries)
 
-    inbox.sort(key=lambda r: r.published)
+    inbox.sort(key=lambda r: r.published, reverse=True)
     return render_template('feed/index.html', subscriptions=subscriptions, inbox=inbox)

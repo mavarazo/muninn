@@ -90,7 +90,8 @@
                                         <label for="check1"></label>
                                     </div>
                                 </td>
-                                <td class="mailbox-name"><a data-toggle="collapse" href="#mailbox-row-summary-{{ loop.index }}" role="button" aria-expanded="false" aria-controls="mailbox-row-summary-{{ loop.index }}">{{ entry.title }}</a></td>
+                                <td class="mailbox-name"></td>
+                                <td class="mailbox-subject"><a data-toggle="collapse" href="#mailbox-row-summary-{{ loop.index }}" role="button" aria-expanded="false" aria-controls="mailbox-row-summary-{{ loop.index }}">{{ entry.title }}</a></td>
                                 <td class="mailbox-attachment"><a href="{{ entry.url }}" target="_blank"><i class="fas fa-external-link-alt"></i></a></td>
                                 <td class="mailbox-date">{{ entry.published }}</td>
                             </tr>
