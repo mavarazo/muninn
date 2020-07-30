@@ -1,4 +1,5 @@
 from datetime import datetime
+from dateutil.parser import parse
 from dataclasses import dataclass, field
 from typing import List, Optional
 from xml.etree.ElementTree import Element
@@ -24,6 +25,13 @@ def _get_text(element: Element, name) -> Optional[str]:
 
     return child.text.strip()
 
+def _get_datetime(element:Element, name) -> Optional[datetime]:
+    child = _get_child(element, name)
+    if child is None:
+        return None
+
+    return parse(child.text.strip())
+
 def _get_attribute_text(element: Element, name, attribute) -> Optional[str]:
     children = _get_children(element, name)
     if children is None:
@@ -34,7 +42,7 @@ def _get_attribute_text(element: Element, name, attribute) -> Optional[str]:
             return child.attrib[attribute]
 
 @dataclass
-class AtomEntry:
+class Item:
     id: str
     title: str
     url: Optional[str] = None
@@ -43,44 +51,80 @@ class AtomEntry:
     summary: Optional[str] = None
 
 @dataclass
-class AtomFeed:
+class Channel:
     title: str
     icon: Optional[str] = None
     image: Optional[str] = None
     url: Optional[str] = None
-    entries: List[AtomEntry] = field(default_factory=list)
+    items: List[Item] = field(default_factory=list)
 
 class AtomClient:
 
-    def fetch(self, url) -> AtomFeed:
+    def fetch(self, url) -> Channel:
         response = requests.request('GET', url)
         root = defused_xml_parse(response.content)
         title = _get_text(root, './feed:title')
         icon = _get_text(root, './feed:icon')
         image = _get_text(root, './feed:logo')
         url = _get_attribute_text(root, './feed:link[@rel="alternate"]', 'href')
-        entries = self.get_entries(root)
+        items = self._get_items(root)
 
-        return AtomFeed(
+        return Channel(
             title,
             icon,
             image,
             url,
-            entries
+            items
         )
 
-    def get_entries(self, element:Element) -> List[AtomEntry]:
-        entries = []
+    def _get_items(self, element:Element) -> List[Item]:
+        items = []
         for child in _get_children(element, './feed:entry'):
-            entries.append(self.get_entry(child))
-        return entries
+            items.append(self._get_item(child))
+        return items
 
-    def get_entry(self, element:Element) -> AtomEntry:
+    def _get_item(self, element:Element) -> Item:
         id = _get_text(element, './feed:id')
         title = _get_text(element, './feed:title')
         url = _get_attribute_text(element, './feed:link[@rel="alternate"]', 'href')
-        published = _get_text(element, './feed:published')
-        updated = _get_text(element, './feed:updated')
+        published = _get_datetime(element, './feed:published')
+        updated = _get_datetime(element, './feed:updated')
         summary = _get_text(element, './feed:summary')
 
-        return AtomEntry(id, title, url, published, updated, summary)
+        return Item(id, title, url, published, updated, summary)
+
+
+class RssClient:
+
+    def fetch(self, url) -> Channel:
+        response = requests.request('GET', url)
+        root = defused_xml_parse(response.content)
+        title = _get_text(root, './channel/title')
+        icon = _get_text(root, './channel/image/url')
+        image = _get_text(root, './channel/image/ur')
+        url = _get_text(root, './channel/url')
+        items = self._get_items(root)
+
+        return Channel(
+            title,
+            icon,
+            image,
+            url,
+            items
+        )
+
+    def _get_items(self, element:Element) -> List[Item]:
+        items = []
+        for child in _get_children(element, './channel/item'):
+            items.append(self._get_item(child))
+        return items
+
+    def _get_item(self, element:Element) -> Item:
+        id = _get_text(element, './guid')
+        title = _get_text(element, './title')
+        url = _get_text(element, './link')
+        published = _get_datetime(element, './pubDate')
+        updated = _get_datetime(element, './pubDate')
+        summary = _get_text(element, './description')
+
+        return Item(id, title, url, published, updated, summary)

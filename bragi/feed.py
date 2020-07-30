@@ -5,7 +5,7 @@ from flask import (Blueprint, flash, g, jsonify, redirect, render_template,
                    request, url_for)
 
 from bragi import db
-from bragi.feedclient import AtomClient, AtomFeed, AtomEntry
+from bragi.feedclient import AtomClient, Channel, Item
 from bragi.models import Feed, FeedEntry
 
 bp = Blueprint('feed', __name__)
@@ -14,7 +14,7 @@ bp = Blueprint('feed', __name__)
 @dataclass
 class Subscription:
     id: int
-    feed: AtomFeed
+    channel: Channel
 
 
 @bp.route('/')
@@ -24,11 +24,11 @@ def index():
     subscriptions = []
     inbox = []
     for feed in feeds:
-        response = AtomClient().fetch(feed.url)
-        subscription = Subscription(feed.id, response)
+        channel = AtomClient().fetch(feed.url)
+        subscription = Subscription(feed.id, channel)
         subscriptions.append(subscription)
         if not id or feed.id == id:
-            inbox.extend(response.entries)
+            inbox.extend(channel.items)
 
     inbox.sort(key=lambda r: r.published, reverse=True)
     return render_template('feed/index.html', subscriptions=subscriptions, inbox=inbox)

@@ -31,9 +31,9 @@
                     {% for subscription in subscriptions %}
                     <li class="nav-item">
                         <a href="#" class="nav-link">
-                            <img src="{{ subscription.feed.icon }}" style="width: auto; max-height: 24px;"></img>
-                            {{ subscription.feed.title }}
-                            <span class="badge bg-primary float-right">{{ subscription.feed.entries|length }}</span>
+                            <img src="{{ subscription.channel.icon }}" style="width: auto; max-height: 24px;"></img>
+                            {{ subscription.channel.title }}
+                            <span class="badge bg-primary float-right">{{ subscription.channel.items|length }}</span>
                         </a>
                     </li>
                     {% endfor %}
@@ -82,7 +82,7 @@
                 <div class="table-responsive mailbox-messages">
                     <table class="table table-hover">
                         <tbody>
-                            {% for entry in inbox %}
+                            {% for item in inbox %}
                             <tr>
                                 <td>
                                     <div class="icheck-primary">
@@ -91,14 +91,13 @@
                                     </div>
                                 </td>
                                 <td class="mailbox-name"></td>
-                                <td class="mailbox-subject"><a data-toggle="collapse" href="#mailbox-row-summary-{{ loop.index }}" role="button" aria-expanded="false" aria-controls="mailbox-row-summary-{{ loop.index }}">{{ entry.title }}</a></td>
-                                <td class="mailbox-attachment"><a href="{{ entry.url }}" target="_blank"><i class="fas fa-external-link-alt"></i></a></td>
-                                <td class="mailbox-date">{{ entry.published }}</td>
-                            </tr>
-                            <tr class="mailbox-row-summary collapse" id="mailbox-row-summary-{{ loop.index }}">
-                                <td colspan="4">
-                                    {{ entry.summary|safe }}
+                                <td class="mailbox-subject">
+                                    <a href="{{ item.url }}" target="_blank">{{ item.title }}</a>
+                                    <div class="mailbox-row-summary">
+                                        {{ item.summary|safe }}
+                                    </div>
                                 </td>
+                                <td class="mailbox-date">{{ moment(item.published).format('DD.MM.YYYY HH:mm') }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
