@@ -1,5 +1,5 @@
-from flask import (Blueprint, flash, g, redirect, render_template, request,
-                   url_for, current_app)
+from flask import (Blueprint, current_app, flash, g, redirect, render_template,
+                   request, url_for)
 
 from bragi.jenkinsclient import JenkinsClient, Job
 

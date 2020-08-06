@@ -17,6 +17,10 @@
 {% block content %}
 <div class="row">
     <div class="col-md-3">
+        <button type="button" class="btn btn-primary btn-block mb-3" data-toggle="modal" data-target="#modal-default">
+            Subscribe
+        </button>
+
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Subscriptions</h3>
@@ -28,12 +32,12 @@
             </div>
             <div class="card-body p-0">
                 <ul class="nav nav-pills flex-column">
-                    {% for subscription in subscriptions %}
+                    {% for feed in feeds %}
                     <li class="nav-item">
                         <a href="#" class="nav-link">
-                            <img src="{{ subscription.channel.icon }}" style="width: auto; max-height: 24px;"></img>
-                            {{ subscription.channel.title }}
-                            <span class="badge bg-primary float-right">{{ subscription.channel.items|length }}</span>
+                            <img src="{{ feed.icon }}" style="width: auto; max-height: 24px;"></img>
+                            {{ feed.name }}
+                            <span class="badge bg-primary float-right">{{ feed.unread() }}</span>
                         </a>
                     </li>
                     {% endfor %}
@@ -44,87 +48,36 @@
             </div>
         </div>
     </div>
-    <div class="col-md-9">
-        <div class="card card-primary card-outline">
-            <div class="card-header">
-                <h3 class="card-title">Inbox</h3>
+</div>
 
-                <div class="card-tools">
-                    <div class="input-group input-group-sm">
-                        <input type="text" class="form-control" placeholder="Search Mail">
-                        <div class="input-group-append">
-                            <div class="btn btn-primary">
-                                <i class="fas fa-search"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body p-0">
-                <div class="mailbox-controls">
-                    <button type="button" class="btn btn-default btn-sm checkbox-toggle"><i class="far fa-square"></i>
+<div class="modal fade" id="modal-default" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('feed.save') }}" method="POST">
+                <div class="modal-header">
+                    <h4 class="modal-title">Subscribe</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
                     </button>
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-default btn-sm"><i class="far fa-trash-alt"></i></button>
-                        <button type="button" class="btn btn-default btn-sm"><i class="fas fa-share"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="input-url">URL</label>
+                        <input type="url" class="form-control" id="input-url" name="url" placeholder="Enter URL" required>
                     </div>
-                    <button type="button" class="btn btn-default btn-sm"><i class="fas fa-sync-alt"></i></button>
-                    <div class="float-right">
-                        1-50/200
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-default btn-sm"><i
-                                    class="fas fa-chevron-left"></i></button>
-                            <button type="button" class="btn btn-default btn-sm"><i
-                                    class="fas fa-chevron-right"></i></button>
-                        </div>
+
+                    <div class="form-group">
+                        <label for="input-name">Name</label>
+                        <input type="url" class="form-control" id="input-name" name="name" placeholder="Enter Name">
                     </div>
                 </div>
-                <div class="table-responsive mailbox-messages">
-                    <table class="table table-hover">
-                        <tbody>
-                            {% for item in inbox %}
-                            <tr>
-                                <td>
-                                    <div class="icheck-primary">
-                                        <input type="checkbox" value="" id="check1">
-                                        <label for="check1"></label>
-                                    </div>
-                                </td>
-                                <td class="mailbox-name"></td>
-                                <td class="mailbox-subject">
-                                    <a href="{{ item.url }}" target="_blank">{{ item.title }}</a>
-                                    <div class="mailbox-row-summary">
-                                        {{ item.summary|safe }}
-                                    </div>
-                                </td>
-                                <td class="mailbox-date">{{ moment(item.published).format('DD.MM.YYYY HH:mm') }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
                 </div>
-            </div>
-            <div class="card-footer p-0">
-                <div class="mailbox-controls">
-                    <button type="button" class="btn btn-default btn-sm checkbox-toggle"><i class="far fa-square"></i>
-                    </button>
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-default btn-sm"><i class="far fa-trash-alt"></i></button>
-                        <button type="button" class="btn btn-default btn-sm"><i class="fas fa-share"></i></button>
-                    </div>
-                    <button type="button" class="btn btn-default btn-sm"><i class="fas fa-sync-alt"></i></button>
-                    <div class="float-right">
-                        1-50/200
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-default btn-sm"><i
-                                    class="fas fa-chevron-left"></i></button>
-                            <button type="button" class="btn btn-default btn-sm"><i
-                                    class="fas fa-chevron-right"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            </form>
         </div>
     </div>
 </div>
+
 {% endblock %}
