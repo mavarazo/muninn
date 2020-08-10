@@ -2,12 +2,12 @@
 
 {% block style %}
 <style>
-    .mailbox-row-summary img {
+    .mailbox-subject img {
         float: left;
         width: auto;
         max-height: 128px;
         padding: 5px;
-        padding-right: 15px;
+        padding-left: 1rem;
     }
 </style>
 {% endblock %}
@@ -26,15 +26,25 @@
                 <h3 class="card-title">Subscriptions</h3>
 
                 <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                    <button type="button" class="btn btn-tool">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
                     </button>
                 </div>
             </div>
             <div class="card-body p-0">
                 <ul class="nav nav-pills flex-column">
+                    <li class="nav-item">
+                        <a href="{{ url_for('feed.index') }}" class="nav-link">
+                            All
+                        </a>
+                    </li>
                     {% for feed in feeds %}
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="{{ url_for('feed.index', id=feed.id) }}" class="nav-link">
                             <img src="{{ feed.icon }}" style="width: auto; max-height: 24px;"></img>
                             {{ feed.name }}
                             <span class="badge bg-primary float-right">{{ feed.unread() }}</span>
@@ -43,11 +53,65 @@
                     {% endfor %}
                 </ul>
             </div>
-            <div class="card-footer">
-                add new feed
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <div class="card card-primary card-outline">
+            <div class="card-header">
+                <h3 class="card-title">Entries</h3>
+
+                <div class="card-tools">
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control" placeholder="Search">
+                        <div class="input-group-append">
+                            <div class="btn btn-primary">
+                                <i class="fas fa-search"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="mailbox-messages">
+                    {% for entry in entries %}
+                    <div class="{{ loop.cycle('bg-light', 'bg-transparent') }}">
+                        <div class="row p-1">
+                            <div class="col-md-auto">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default btn-sm checkbox-toggle"><i
+                                            class="far fa-square"></i> </button>
+                                    <button type="button" class="btn btn-default btn-sm"><i
+                                            class="fas fa-star"></i></button>
+                                    <button type="button" class="btn btn-default btn-sm"><i
+                                            class="fas fa-share"></i></button>
+                                </div>
+                            </div>
+
+                            <div class="col-md-9 pt-1">
+                                <div class="mailbox-name"><a href="{{ entry.url }}"
+                                        target="_blank">{{ entry.title }}</a>
+                                </div>
+                            </div>
+
+                            <div class="col-md-auto">
+                                <div class="mailbox-date">
+                                    {{ moment(entry.created_on).format('LLL') }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row p-1">
+                            <div class="col-md">
+                                <div class="mailbox-subject">{{ entry.summary|safe }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
+
 </div>
 
 <div class="modal fade" id="modal-default" style="display: none;" aria-hidden="true">
@@ -63,7 +127,8 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="input-url">URL</label>
-                        <input type="url" class="form-control" id="input-url" name="url" placeholder="Enter URL" required>
+                        <input type="url" class="form-control" id="input-url" name="url" placeholder="Enter URL"
+                            required>
                     </div>
 
                     <div class="form-group">
@@ -72,7 +137,6 @@
                     </div>
                 </div>
                 <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Save</button>
                 </div>
             </form>
@@ -80,4 +144,18 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block script %}
+<script>
+    $('.fa-sync-alt').click(function () {
+        $.ajax({
+            url: "/feed/api/refresh",
+            type: "GET",
+            success: function (data) {
+                location.reload(true);
+            }
+        });
+    });
+</script>
 {% endblock %}

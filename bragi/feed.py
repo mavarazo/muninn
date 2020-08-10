@@ -34,17 +34,19 @@ def refresh(force:bool=False):
         for item in channel.items:
             entry = Entry.query.filter(Entry.guid == item.id).first()
             if not entry:
-                entry = Entry(url=item.url, title=item.title, guid=item.id, summary=item.summary, feed_id=feed.id)
+                entry = Entry(created_on=item.published, updated_on = item.updated, url=item.url, title=item.title, guid=item.id, summary=item.summary, feed_id=feed.id)
                 db.session.add(entry)
         
         db.session.commit()
+    
+    return jsonify([feed.as_dict() for feed in feeds])
 
 
 @bp.route('/')
 def index():
-    feeds = Feed.query.order_by(Feed.name.desc())
     id = request.args.get('id')
-    return render_template('feed/index.html', feeds=feeds)
+    entries = Entry.query.order_by(Entry.created_on.desc()) if not id else Entry.query.filter(Entry.feed_id == id).order_by(Entry.created_on.desc())
+    return render_template('feed/index.html', feeds=Feed.query.order_by(Feed.name.desc()), entries=entries)
 
 
 @bp.route('/save', methods=['POST'])

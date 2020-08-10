@@ -30,6 +30,9 @@ class Feed(db.Model):
     def unread(self):
         return Entry.query.filter(Entry.feed_id == self.id, Entry.read == False).count()
 
+    def as_dict(self):
+       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
     def __repr__(self):
         return f'<Feed {self.url}>'
 
@@ -47,5 +50,8 @@ class Entry(db.Model):
 
     feed_id = db.Column(db.Integer, db.ForeignKey('feed.id'), nullable=False)
 
+    def as_dict(self):
+       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
     def __repr__(self):
-        return f'<FeedEntry {self.feedid}>'
+        return f'<Entry {self.url}>'
