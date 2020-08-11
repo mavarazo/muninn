@@ -39,14 +39,59 @@ def refresh(force:bool=False):
         
         db.session.commit()
     
-    return jsonify([feed.as_dict() for feed in feeds])
+    return jsonify(success=True)
+
+
+@bp.route('/api/entry/read/all', methods=['POST'])
+def entry_read_all():
+    entries = Entry.query.filter(Entry.read == False).all()
+    for entry in entries:
+        entry.read = True
+ 
+    db.session.commit()
+    return jsonify(success=True)
+
+
+@bp.route('/api/entry/read', methods=['POST'])
+def entry_read():
+    id = request.form['entry_id']
+    entry = Entry.query.filter(Entry.id == id).one_or_none()
+    if not entry:
+        return jsonify(success=False)
+
+    entry.read = not entry.read
+    db.session.commit()
+    return jsonify(success=True)
+
+
+@bp.route('/api/entry/star', methods=['POST'])
+def entry_star():
+    id = request.form['entry_id']
+    entry = Entry.query.filter(Entry.id == id).one_or_none()
+    if not entry:
+        return jsonify(success=False)
+
+    entry.starred = not entry.starred
+    db.session.commit()
+    return jsonify(success=True)
 
 
 @bp.route('/')
 def index():
+    conditions = {}
     id = request.args.get('id')
-    entries = Entry.query.order_by(Entry.created_on.desc()) if not id else Entry.query.filter(Entry.feed_id == id).order_by(Entry.created_on.desc())
-    return render_template('feed/index.html', feeds=Feed.query.order_by(Feed.name.desc()), entries=entries)
+    if id:
+        conditions['feed_id'] = id
+
+    filter = request.args.get('filter')
+    if filter and filter == 'unread':
+        conditions['read'] = False
+
+    if filter and filter == 'starred':
+        conditions['starred'] = True
+
+    entries = Entry.query.filter_by(**conditions).order_by(Entry.created_on.desc())
+    return render_template('feed/index.html', feeds=Feed.query.order_by(Feed.name.desc()), unread=Entry.query.filter(Entry.read == False).count(), starred=Entry.query.filter(Entry.starred == True).count(), entries=entries)
 
 
 @bp.route('/save', methods=['POST'])

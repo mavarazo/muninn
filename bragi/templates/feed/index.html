@@ -38,9 +38,19 @@
             <div class="card-body p-0">
                 <ul class="nav nav-pills flex-column">
                     <li class="nav-item">
-                        <a href="{{ url_for('feed.index') }}" class="nav-link">
-                            All
-                        </a>
+                        <a href="{{ url_for('feed.index') }}" class="nav-link"><i class="fas fa-inbox"></i> All </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('feed.index', filter='unread') }}" class="nav-link"><i
+                                class="far fa-envelope"></i> Unread 
+                                <span class="badge bg-primary float-right">{{ unread }}</span>
+                            </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('feed.index', filter='starred') }}" class="nav-link"><i
+                                class="fas fa-star"></i> Starred 
+                                <span class="badge bg-primary float-right">{{ starred }}</span>
+                            </a>
                     </li>
                     {% for feed in feeds %}
                     <li class="nav-item">
@@ -59,7 +69,11 @@
     <div class="col-md-9">
         <div class="card card-primary card-outline">
             <div class="card-header">
-                <h3 class="card-title">Entries</h3>
+                <h3 class="card-title">
+                    <button type="button" class="btn btn-default btn-sm btn-read-all">
+                        <i class="far fa-square"></i> Mark all as read
+                    </button>
+                </h3>
 
                 <div class="card-tools">
                     <div class="input-group input-group-sm">
@@ -79,18 +93,30 @@
                         <div class="row p-1">
                             <div class="col-md-auto">
                                 <div class="btn-group">
-                                    <button type="button" class="btn btn-default btn-sm checkbox-toggle"><i
-                                            class="far fa-square"></i> </button>
-                                    <button type="button" class="btn btn-default btn-sm"><i
-                                            class="fas fa-star"></i></button>
-                                    <button type="button" class="btn btn-default btn-sm"><i
-                                            class="fas fa-share"></i></button>
+                                    <button type="button" class="btn btn-default btn-sm btn-read"
+                                        data-entry-id="{{ entry.id }}">
+                                        {% if entry.read %}
+                                        <i class="far fa-check-square"></i>
+                                        {% else %}
+                                        <i class="far fa-square"></i>
+                                        {% endif %}
+                                    </button>
+                                    <button type="button" class="btn btn-default btn-sm btn-starred"
+                                        data-entry-id="{{ entry.id }}">
+                                        {% if entry.starred %}
+                                        <i class="fas fa-star"></i>
+                                        {% else %}
+                                        <i class="far fa-star"></i>
+                                        {% endif %}
+                                    </button>
+                                    <button type="button" class="btn btn-default btn-sm btn-share"
+                                        data-entry-id="{{ entry.id }}"><i class="fas fa-share"></i></button>
                                 </div>
                             </div>
 
                             <div class="col-md-9 pt-1">
-                                <div class="mailbox-name"><a href="{{ entry.url }}"
-                                        target="_blank">{{ entry.title }}</a>
+                                <div class="mailbox-name">
+                                    <a href="{{ entry.url }}" target="_blank">{{ entry.title }}</a>
                                 </div>
                             </div>
 
@@ -156,6 +182,46 @@
                 location.reload(true);
             }
         });
+    });
+
+    $('.btn-read-all').click(function () {
+        $.ajax({
+            url: '/feed/api/entry/read/all',
+            type: 'POST',
+            success: function (response) {
+                window.location.reload(true);
+            }
+        })
+    });
+
+    $('.btn-read').click(function () {
+        var btn = $(this);
+        entryId = btn.attr("data-entry-id");
+        $.ajax({
+            url: '/feed/api/entry/read',
+            type: 'POST',
+            data: {
+                'entry_id': entryId
+            },
+            success: function (response) {
+                btn.find('i').toggleClass('fa-square fa-check-square');
+            }
+        })
+    });
+
+    $('.btn-starred').click(function () {
+        var btn = $(this);
+        entryId = btn.attr("data-entry-id");
+        $.ajax({
+            url: '/feed/api/entry/star',
+            type: 'POST',
+            data: {
+                'entry_id': entryId
+            },
+            success: function (response) {
+                btn.find('i').toggleClass('far fas');
+            }
+        })
     });
 </script>
 {% endblock %}
