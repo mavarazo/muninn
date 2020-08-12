@@ -42,15 +42,15 @@
                     </li>
                     <li class="nav-item">
                         <a href="{{ url_for('feed.index', filter='unread') }}" class="nav-link"><i
-                                class="far fa-envelope"></i> Unread 
-                                <span class="badge bg-primary float-right">{{ unread }}</span>
-                            </a>
+                                class="far fa-envelope"></i> Unread
+                            <span class="badge bg-primary float-right">{{ unread }}</span>
+                        </a>
                     </li>
                     <li class="nav-item">
                         <a href="{{ url_for('feed.index', filter='starred') }}" class="nav-link"><i
-                                class="fas fa-star"></i> Starred 
-                                <span class="badge bg-primary float-right">{{ starred }}</span>
-                            </a>
+                                class="fas fa-star"></i> Starred
+                            <span class="badge bg-primary float-right">{{ starred }}</span>
+                        </a>
                     </li>
                     {% for feed in feeds %}
                     <li class="nav-item">
@@ -76,14 +76,16 @@
                 </h3>
 
                 <div class="card-tools">
-                    <div class="input-group input-group-sm">
-                        <input type="text" class="form-control" placeholder="Search">
-                        <div class="input-group-append">
-                            <div class="btn btn-primary">
-                                <i class="fas fa-search"></i>
+                    <form action="{{ url_for('feed.index') }}" method="POST">
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control" name="search" placeholder="Search" value="{{ request.form['search'] }}">
+                            <div class="input-group-append">
+                                <div class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
             <div class="card-body p-0">

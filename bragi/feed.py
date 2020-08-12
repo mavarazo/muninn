@@ -9,6 +9,9 @@ from bragi import db
 from bragi.feedclient import AtomClient, Channel, Item
 from bragi.models import Entry, Feed
 
+from sqlalchemy import or_
+
+
 bp = Blueprint('feed', __name__)
 
 
@@ -76,27 +79,33 @@ def entry_star():
     return jsonify(success=True)
 
 
-@bp.route('/')
+@bp.route('/', methods=['GET', 'POST'])
 def index():
-    conditions = {}
-    id = request.args.get('id')
-    if id:
-        conditions['feed_id'] = id
+    return render_template('feed/index.html', feeds=Feed.query.order_by(Feed.name.desc()), unread=Entry.query.filter(Entry.read == False).count(), starred=Entry.query.filter(Entry.starred == True).count(), entries=get_entries(request))
 
-    filter = request.args.get('filter')
-    if filter and filter == 'unread':
-        conditions['read'] = False
 
-    if filter and filter == 'starred':
-        conditions['starred'] = True
+def get_entries(request:request) -> list:
+    if request.method == 'POST':
+        search = request.form['search']
+        return Entry.query.filter(or_(Entry.title.like(f'%{ search }%'), Entry.summary.like(f'%{ search }%'))).order_by(Entry.created_on.desc())
+    else:
+        conditions = {}
+        id = request.args.get('id')
+        if id:
+            conditions['feed_id'] = id
 
-    entries = Entry.query.filter_by(**conditions).order_by(Entry.created_on.desc())
-    return render_template('feed/index.html', feeds=Feed.query.order_by(Feed.name.desc()), unread=Entry.query.filter(Entry.read == False).count(), starred=Entry.query.filter(Entry.starred == True).count(), entries=entries)
+        filter = request.args.get('filter')
+        if filter and filter == 'unread':
+            conditions['read'] = False
+
+        if filter and filter == 'starred':
+            conditions['starred'] = True
+        
+        return Entry.query.filter_by(**conditions).order_by(Entry.created_on.desc())
 
 
 @bp.route('/save', methods=['POST'])
 def save():
-    print(request.form['url'])
     feed = Feed(url=request.form['url'], name=request.form['name'])
     db.session.add(feed)
     db.session.commit()
