@@ -2,8 +2,8 @@ from flask import (Blueprint, Response, flash, g, redirect, render_template,
                    request, url_for)
 from werkzeug.exceptions import abort
 
-from bragi.jenkins import JenkinsClient
-from bragi.models import Feed
+from muninn.jenkins import JenkinsClient
+from muninn.models import Feed
 
 bp = Blueprint('dashboard', __name__)
 

@@ -37,5 +37,5 @@ def create_app(config_class=Config):
 
     return app
 
-from bragi import models
+from muninn import models
 

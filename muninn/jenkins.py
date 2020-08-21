@@ -1,7 +1,7 @@
 from flask import (Blueprint, current_app, flash, g, redirect, render_template,
                    request, url_for)
 
-from bragi.jenkinsclient import JenkinsClient, Job
+from muninn.jenkinsclient import JenkinsClient, Job
 
 jobs = [
     Job('main', 'https://build.internal.adcubum.com/job/syrius3-pipeline/job/master', True, False),

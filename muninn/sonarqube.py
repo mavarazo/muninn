@@ -1,7 +1,7 @@
 from flask import (Blueprint, current_app, flash, g, redirect, render_template,
                    request, url_for)
 
-from bragi.sonarqubeclient import Application, Portfolio, SonarQubeClient
+from muninn.sonarqubeclient import Application, Portfolio, SonarQubeClient
 
 portfolios = [
     Portfolio('Fachteam Bestand KVA', 'https://build.internal.adcubum.com/job/syrius3-pipeline/job/master', [Application('SYRIUS-bestand-firmenkunden-modul')])

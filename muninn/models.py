@@ -1,4 +1,4 @@
-from bragi import db
+from muninn import db
 
 class JenkinsJob(db.Model):
     id = db.Column(db.Integer, primary_key=True)
