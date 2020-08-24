@@ -5,9 +5,9 @@ from typing import List, Optional
 from flask import (Blueprint, current_app, flash, g, jsonify, redirect,
                    render_template, request, url_for)
 
-from bragi import db
-from bragi.feedclient import AtomClient, Channel, Item
-from bragi.models import Entry, Feed
+from muninn import db
+from muninn.feedclient import AtomClient, Channel, Item
+from muninn.models import Entry, Feed
 
 from sqlalchemy import or_
 
